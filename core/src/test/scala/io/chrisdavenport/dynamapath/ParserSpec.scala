@@ -154,4 +154,18 @@ class ParserSpec extends Specification {
 
   }
 
+  "Path Renderer" should {
+    "render a known path" in {
+      val init = "/bar"
+      val p = Path(List(
+        Constant("bar"),
+        OptVariable("colors")
+      ))
+
+      Parser.renderPath(p, Map.empty) must beRight.like {
+        case s => s must_=== init
+      }
+    }
+  }
+
 }

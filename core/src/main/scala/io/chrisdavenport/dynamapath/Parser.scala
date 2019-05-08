@@ -54,9 +54,13 @@ object Parser {
   final case class OptionalPV(o: Option[String]) extends PathValue
   final case class PV(s: String) extends PathValue
 
-  def fromPath(s: String, path: Path): Option[Map[String, PathValue]] ={
-    val segments: List[String] = s.split('/').drop(1).toList
-    // Quick Failure Mode
+  private[dynamapath] def segments(s: String): List[String] =
+    s.split('/').drop(1).toList 
+
+  def fromPath(s: String, path: Path): Option[Map[String, PathValue]] =
+    fromPathSegments(segments(s), path)
+
+  def fromPathSegments(segments: List[String], path: Path): Option[Map[String, PathValue]] ={
     val matchesPathReqs: Boolean = path.path
       .zipWithIndex
       .forall {
@@ -96,6 +100,47 @@ object Parser {
       out <- go(segments, path.path, Map.empty)
     } yield out
   }
+
+  def renderPathSegments(path: Path, variables: Map[String, PathValue]): Either[NonEmptyList[String], List[String]] = {
+    path.path.parFlatTraverse{
+      case Constant(value) => Either.right(List(value))
+      case Variable(name) => variables.get(name).toRight(NonEmptyList.of(s"Missing Variable $name"))
+        .flatMap{
+          case PV(s) => Either.right(List(s))
+          case other => Either.left(NonEmptyList.of(s"Variable: $name, not of type PV got - $other"))
+        }
+      case OptVariable(name) => variables.get(name)
+        .fold(Either.right[NonEmptyList[String], List[String]](List.empty)){
+          case PV(s) =>  Either.right(List(s))
+          case OptionalPV(o) => o match {
+            case None => Either.right(List.empty)
+            case Some(s) => Either.right(List(s))
+          }
+          case other => Either.left(NonEmptyList.of(s"Variable: $name, not of type PV or OptionalPV got - $other"))
+        }
+      case OneOrMoreVariable(name) => variables.get(name).toRight(NonEmptyList.of(s"Missing OneOrMoreVariable $name"))
+        .flatMap{
+          case PV(s) => Either.right(List(s))
+          case NelPV(nel) => Either.right(nel.toList)
+          case other => Either.left(NonEmptyList.of(s"Variable: $name, not of type PV or NelPV got - $other"))
+        }
+      case ZeroOrMoreVariable(name) => variables.get(name)
+        .fold(Either.right[NonEmptyList[String], List[String]](List.empty)){
+          case PV(s) =>  Either.right(List(s))
+          case OptionalPV(o) => o match {
+            case None => Either.right(List.empty)
+            case Some(s) => Either.right(List(s))
+          }
+          case NelPV(nel) => Either.right(nel.toList)
+          case ListPV(l) => Either.right(l)
+        }
+    }
+  }
+
+  def renderPath(path: Path, variables: Map[String, PathValue]): Either[NonEmptyList[String], String] =
+    renderPathSegments(path, variables).map(s => 
+      "/" + s.intercalate("/")
+    ) 
 
 
 }
