@@ -155,7 +155,7 @@ class ParserSpec extends Specification {
   }
 
   "Path Renderer" should {
-    "render a known path" in {
+    "render an optional variable with no present variable" in {
       val init = "/bar"
       val p = Path(List(
         Constant("bar"),
@@ -166,6 +166,103 @@ class ParserSpec extends Specification {
         case s => s must_=== init
       }
     }
+
+    "render a present optional variable" in {
+      val init = "/bar/orange"
+      val p = Path(List(
+        Constant("bar"),
+        OptVariable("colors")
+      ))
+      val variables = Map(
+        "colors" -> OptionalPV(Some("orange"))
+      )
+      Parser.renderPath(p, variables) must beRight.like {
+        case s => s must_=== init
+      }
+    }
+
+    "render a path optional variable with a variable" in {
+      val init = "/bar/orange"
+      val p = Path(List(
+        Constant("bar"),
+        OptVariable("colors")
+      ))
+      val variables = Map(
+        "colors" -> PV("orange")
+      )
+      Parser.renderPath(p, variables) must beRight.like {
+        case s => s must_=== init
+      }
+    }
+
+    "render a path variable when present" in {
+      val init = "/bar/orange"
+      val p = Path(List(
+        Constant("bar"),
+        Variable("colors")
+      ))
+      val variables = Map(
+        "colors" -> PV("orange")
+      )
+      Parser.renderPath(p, variables) must beRight.like {
+        case s => s must_=== init
+      }
+    }
+
+    "fail to render if a path variable is not present" in {
+      val p = Path(List(
+        Constant("bar"),
+        Variable("colors")
+      ))
+      val variables : Map[String, PathValue] = Map.empty
+      Parser.renderPath(p, variables) must beLeft.like {
+        case s => s must_=== NonEmptyList.of(
+          "Missing Variable colors"
+        )
+      }
+    }
+
+    "render a  path nonempty variable with a nonempty variable present" in {
+      val init = "/bar/orange/yellow"
+      val p = Path(List(
+        Constant("bar"),
+        OneOrMoreVariable("colors")
+      ))
+      val variables = Map(
+        "colors" -> NelPV(NonEmptyList.of("orange", "yellow"))
+      )
+      Parser.renderPath(p, variables) must beRight.like {
+        case s => s must_=== init
+      }
+    }
+
+    "render a path nonempty variable with a variable present" in {
+      val init = "/bar/orange"
+      val p = Path(List(
+        Constant("bar"),
+        OneOrMoreVariable("colors")
+      ))
+      val variables = Map(
+        "colors" -> PV("orange")
+      )
+      Parser.renderPath(p, variables) must beRight.like {
+        case s => s must_=== init
+      }
+    }
+
+    "fail to render a path nonempty variable when not present" in {
+      val p = Path(List(
+        Constant("bar"),
+        OneOrMoreVariable("colors")
+      ))
+      val variables : Map[String, PathValue] = Map.empty
+      Parser.renderPath(p, variables) must beLeft.like {
+        case s => s must_=== NonEmptyList.of(
+          "Missing OneOrMoreVariable colors"
+        )
+      }
+    }
+
   }
 
 }
