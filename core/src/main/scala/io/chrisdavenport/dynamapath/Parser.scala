@@ -2,6 +2,7 @@ package io.chrisdavenport.dynamapath
 
 import atto._
 import Atto._
+import cats._
 import cats.data._
 import cats.implicits._
 import cats.Alternative
@@ -18,7 +19,19 @@ object Parser {
   final case class ZeroOrMoreVariable(name: String) extends PathSegment
   final case class OneOrMoreVariable(name: String) extends PathSegment
 
-  final case class Path(path: List[PathSegment]) extends AnyVal
+  final case class Path(path: List[PathSegment]) extends AnyVal{
+    def combine(that: Path): Path = 
+      Path(path <+> that.path)
+  }
+  object Path {
+    implicit val pathInstances: Monoid[Path] = new Monoid[Path]{
+        // Members declared in cats.kernel.Monoid
+        def empty: Path = Path(List.empty)
+  
+        // Members declared in cats.kernel.Semigroup
+        def combine(a: Path,y: Path): Path = a.combine(y)
+    }
+  }
 
   private val slash = '/'
   private val SLASH = char(slash).named("Slash")
