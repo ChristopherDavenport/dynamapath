@@ -1,0 +1,11 @@
+name: dynamapath
+baseurl: /dynamapath
+description: Dynamic Path Parsing
+highlighter: rouge
+docs: true
+collections:
+  tut:
+    output: true
+version: 0.0.2-SNAPSHOT
+org: io.chrisdavenport
+markdown: kramdown
