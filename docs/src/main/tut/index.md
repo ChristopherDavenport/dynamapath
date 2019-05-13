@@ -15,3 +15,23 @@ libraryDependencies ++= Seq(
   "io.chrisdavenport" %% "dynamapath" % "<version>"
 )
 ```
+
+## Parameters
+
+### Named Parameters
+
+Named parameters are defined by prefixing a colon to the parameter name (`:foo`).
+
+### Parameter Modifiers
+
+#### Optional
+
+Parameters can be suffixed with a question mark (`?`) to make the parameter optional (`:foo?`).
+
+#### Zero or more
+
+Parameters can be suffixed with an asterisk (`*`) to denote a zero or more parameter matches (`:foo*`).
+
+#### One or more
+
+Parameters can be suffixed with a plus sign (`+`) to denote a one or more parameter matches (`:foo+`).
