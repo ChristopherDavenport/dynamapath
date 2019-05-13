@@ -12,3 +12,9 @@ libraryDependencies ++= Seq(
   "io.chrisdavenport" %% "dynamapath" % "<version>"
 )
 ```
+
+## Credits
+
+Inspiration for this library was drawn from [path-to-regexp](https://github.com/pillarjs/path-to-regexp),
+[Brandon Ros](https://github.com/brandonros) initially made me aware of the concept,
+and I thought it was intriguing enough to merit translation.
