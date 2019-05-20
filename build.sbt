@@ -25,7 +25,7 @@ val attoV = "0.6.5"
 
 val specs2V = "4.5.1"
 
-val kindProjectorV = "0.10.0"
+val kindProjectorV = "0.10.1"
 val betterMonadicForV = "0.3.0"
 
 // General Settings
