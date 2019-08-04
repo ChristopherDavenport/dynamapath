@@ -25,7 +25,7 @@ lazy val contributors = Seq(
 val catsV = "1.6.1"
 val attoV = "0.6.5"
 
-val specs2V = "4.6.0"
+val specs2V = "4.7.0"
 
 val kindProjectorV = "0.10.3"
 val betterMonadicForV = "0.3.0"
