@@ -22,9 +22,9 @@ lazy val contributors = Seq(
   "ChristopherDavenport" -> "Christopher Davenport"
 )
 
-val catsV = "1.6.1"
-val attoV = "0.7.1"
 
+val catsV = "2.0.0"
+val attoV = "0.7.1"
 val specs2V = "4.7.1"
 
 val kindProjectorV = "0.10.3"
@@ -35,7 +35,7 @@ lazy val commonSettings = Seq(
   organization := "io.chrisdavenport",
 
   scalaVersion := "2.12.8",
-  crossScalaVersions := Seq(scalaVersion.value, "2.11.12"),
+  crossScalaVersions := Seq(scalaVersion.value, "2.13.0", "2.11.12"),
   scalacOptions += "-Yrangepos",
 
   scalacOptions in (Compile, doc) ++= Seq(
